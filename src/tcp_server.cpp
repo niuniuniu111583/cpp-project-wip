@@ -37,7 +37,7 @@ void *communication(void *arg)
     cout << "communication tid:" << pthread_self() << endl;
     SocketInfo *info = (SocketInfo *)arg;
     char buf[5];
-    char temp[1024];
+    string temp;
     bzero(temp, sizeof(temp));
     while (1)
     {
@@ -45,10 +45,10 @@ void *communication(void *arg)
 
         if (len == -1)
         {
-            if (errno == EAGAIN)
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
                 cout << "数据已经接收完毕..." << endl;
-                send(info->fd, temp, strlen(temp) + 1, 0);
+                send(info->fd, temp.c_str(), temp.size(), 0);
                 break;
             }
             else
@@ -64,12 +64,14 @@ void *communication(void *arg)
             close(info->fd);
             break;
         }
-        cout << "read buf:" << buf << endl;
+        cout << "read buf:" ;
+        cout.write(buf,len);
+        cout<<endl;
         for (int i = 0; i < len; i++)
         {
             buf[i] = toupper(buf[i]);
         }
-        strncat(temp + strlen(temp), buf, len);
+        temp.append(buf,len);
         write(STDOUT_FILENO, buf, len);
         cout << endl;
     }

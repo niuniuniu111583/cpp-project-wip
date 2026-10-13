@@ -30,11 +30,18 @@ int main(){
 
         write(cfd,buff,strlen(buff)+1);
         int len=read(cfd,buff,sizeof(buff));
-        if(len==-1){
-            perror("read error");
-            exit(1);
+        if(len>0){
+           printf("read buff=%s\n",buff);
         }
-        printf("read buff=%s\n",buff);
+        else if(len==0){
+            cout<<"server断开连接..."<<endl;
+            break;
+        }
+        else{
+            perror("read error");
+            break;
+        }
+        
         /*sprintf(buff,"hello，world，%d...\n",number++);
         send(cfd,buff,strlen(buff)+1,0);
 
