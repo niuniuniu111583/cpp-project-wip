@@ -1,0 +1,14 @@
+# Build output
+build/
+
+# Compiled binaries and object files
+*.o
+*.a
+*.so
+*.out
+
+# VS Code local settings
+.vscode/
+
+# Personal notes
+tipAll.txt

@@ -1,0 +1,6 @@
+防止头文件被重复包含：
+1>#pragma once
+2>#ifndef MY_HEADER_H
+#define MY_HEADER_H
+//内容
+#endif
