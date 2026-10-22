@@ -1,11 +1,19 @@
 #include <iostream>
 #include <arpa/inet.h>
-#include<sys/socket.h>
-#include<netinet/in.h>
-#include<cstdio>
-#include<unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <cstdio>
+#include "server.hpp"
+#include <unistd.h>
 using namespace std;
-int initListenFd(unsigned short port)
+
+Server::Server(unsigned short port)
+{
+    listenFd_ = initListenFd(port);
+    listenChannel_ = new Channel(listenFd_);//使用 listenFd_ 创建 Channel 对象，并将对象的地址保存到 listenChannel_
+    cout<<"Server initialized,lfd="<<listenFd_<<endl;
+}
+int Server::initListenFd(unsigned short port)
 {
     int lfd = socket(AF_INET, SOCK_STREAM, 0);
     if (lfd == -1)
@@ -22,18 +30,20 @@ int initListenFd(unsigned short port)
         close(lfd);
         return -1;
     }
-    struct sockaddr_in addr{};//初始化为0
+    struct sockaddr_in addr{}; // 初始化为0
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = INADDR_ANY;
     ret = bind(lfd, (struct sockaddr *)&addr, sizeof(addr));
-    if(ret==-1){
+    if (ret == -1)
+    {
         perror("bind");
         close(lfd);
         return -1;
     }
-    ret=listen(lfd,128);
-    if(ret==-1){
+    ret = listen(lfd, 128);
+    if (ret == -1)
+    {
         perror("listen");
         close(lfd);
         return -1;
