@@ -2,6 +2,12 @@
 #include<iostream>
 using namespace std;
 
+Channel::Channel(int fd){
+    fd_=fd;
+}
+int Channel::getFd()const{
+    return fd_;
+}
 void Channel::setReadCallback(EventCallback cb){
     readCallback_=cb;
 }
