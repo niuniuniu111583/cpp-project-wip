@@ -5,14 +5,48 @@
 #include <cstdio>
 #include "server.hpp"
 #include <unistd.h>
+#include <stdexcept>
 using namespace std;
 
 Server::Server(unsigned short port)
 {
     listenFd_ = initListenFd(port);
-    listenChannel_ = new Channel(listenFd_);//使用 listenFd_ 创建 Channel 对象，并将对象的地址保存到 listenChannel_
-    cout<<"Server initialized,lfd="<<listenFd_<<endl;
+    if (listenFd_ == -1)
+    {
+        throw runtime_error("initListenFd error");
+    }
+
+    // 使用 listenFd_ 创建 Channel 对象，并将对象的地址保存到 listenChannel_。
+    listenChannel_ = new Channel(listenFd_);
+    // 把监听 Channel 注册给 EventLoop
+    eventloop_.addChannel(listenChannel_);
+
+    listenChannel_->setReadCallback([this]()
+                                    {
+        cout<<"new connection event!"<<endl;
+        handleNewConnection(); });
+
+    cout << "Server initialized,lfd=" << listenFd_ << endl;
 }
+
+void Server::start(){
+    eventloop_.loop();
+}
+
+void Server::handleNewConnection()
+{
+    struct sockaddr_in clientAddr{};
+    socklen_t clientLen=sizeof(clientAddr);
+    int cfd = accept(listenFd_, (struct sockaddr *)&clientAddr, &clientLen);
+    if (cfd == -1)
+    {
+        perror("accept");
+        return;
+    }
+    cout << "new client connected,cfd=" << cfd << endl;
+    close(cfd);
+}
+
 int Server::initListenFd(unsigned short port)
 {
     int lfd = socket(AF_INET, SOCK_STREAM, 0);

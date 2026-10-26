@@ -8,4 +8,4 @@ set(CMAKE_BUILD_TYPE Debug)
 
 include_directories(include)
 
-add_executable(server ./src/server.cpp ./src/channel.cpp ./src/main.cpp)
+add_executable(server ./src/main.cpp ./src/server.cpp ./src/channel.cpp ./src/epoll.cpp ./src/eventloop.cpp)
