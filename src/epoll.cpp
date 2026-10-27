@@ -32,11 +32,20 @@ bool Epoll::addFd(int fd)
     }
     return true;
 }
+bool Epoll::rmFd(int fd){
+    int ret=epoll_ctl(epollFd_,EPOLL_CTL_DEL,fd,NULL);
+    if(ret==-1){
+        perror("epoll_ctl");
+        return false;
+    }
+    return true;
+}
+
 vector<int> Epoll::waitEvents()
 {
     // events数组用来接收 epoll_wait() 返回的就绪事件
     struct epoll_event events[1024];
-    int num = epoll_wait(epollFd_, events, 1024, -1);
+    int num = epoll_wait(epollFd_, events, 1024, 1000);
 
     vector<int> readyFds;
     if (num == -1)
