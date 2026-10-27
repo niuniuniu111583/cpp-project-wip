@@ -1,6 +1,7 @@
 #pragma once
 #include "channel.hpp"
 #include "eventloop.hpp"
+#include <vector>
 
 class Server
 {
@@ -14,6 +15,7 @@ private:
     int listenFd_;
     Channel *listenChannel_;
     EventLoop eventloop_;
+    std::vector<Channel*>clientChannels_;
 
     // 当监听套接字有新连接时，调用 accept() 接收它。
     void handleNewConnection();

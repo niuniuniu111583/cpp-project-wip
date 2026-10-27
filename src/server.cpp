@@ -44,7 +44,31 @@ void Server::handleNewConnection()
         return;
     }
     cout << "new client connected,cfd=" << cfd << endl;
-    close(cfd);
+    //为client创建channel
+    Channel* clientChannel=new Channel(cfd);
+    //设置client的读事件回调
+    clientChannel->setReadCallback([cfd](){
+        char buf[1024]={};
+        ssize_t len=recv(cfd,buf,sizeof(buf),0);
+        if(len>0){
+            cout<<"client sent : ";
+            cout.write(buf,len);
+            cout<<endl; 
+        }
+        else if(len==0){
+            cout<<"client disconnected , cfd = "<<cfd<<endl;
+            close(cfd);
+        }
+        else{
+            perror("recv");
+        }
+
+    });
+    //注册到EventLoop
+    eventloop_.addChannel(clientChannel);
+    //保存client的Channel
+    clientChannels_.push_back(clientChannel);
+
 }
 
 int Server::initListenFd(unsigned short port)

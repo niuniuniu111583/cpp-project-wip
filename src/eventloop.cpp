@@ -1,6 +1,7 @@
 #include"eventloop.hpp"
 
 EventLoop::EventLoop(){}
+
 void EventLoop::addChannel(Channel* channel){
     int fd=channel->getFd();
     if(epoll_.addFd(fd)){
